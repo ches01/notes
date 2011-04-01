@@ -1,0 +1,76 @@
+﻿###### для Windows-Mingw ######
+
+ 1. Если у не установлен Mingw, устанавливаем :)
+ 2. Устанавливаем в C:\mingw или в другое предпочтительное место не содержащее пробелов
+    и символов не ASCII, чтоб не возникло в будущем проблем
+ 3. Проверяем, доступен ли он из переменной среды PATH:
+        - Открываем командную строку(Win+R -> cmd -> Enter).
+        - Вводим "gcc".
+ 4. Скачиваем исходники boost, распаковываем в корень диска "C:/".
+ 5. Открываем командную строку(Win+R -> cmd -> Enter), заходим в корневой каталог
+    библиотеки с исходниками boost.
+ 6. Для сборки boost, необходим bjam(система сборки boost, и не только). Для этого,
+    в консоли вводим "bootstrap.bat" и ждем пока соберется bjam.
+        - если, bjam собран успешно, переходим к сборке библиотек boost.
+        - если, при сдорке bjam произошла ошибка, то:
+            а) переходим в каталог: BOOST_DIR\tools\jam\src или 
+               BOOST_DIR\tools\build\v2\engine\src, в зависимости от версии boost он
+               может отличаться, найти его можно через поиск по файлам
+            б) выполняем: build.bat mingw
+            в) bjam собирется в каталоге bin.xxx
+            г) копируем его в корень каталога буст.
+ 7. Для сборки библиотек boost, необходимо запустить bjam(из BOOST_DIR) с некоторыми
+    опциями. Чтоб не писать их вручную, создаем .bat файл с именем build.bat(сохраняем
+    его в корень каталога с исходниками boost), с таким содержанием:
+
+------------------------build.bat---------------------------------------
+@echo off
+set MINGWDIR=c:/mingw
+rem check if mingw path correct
+if not exist %MINGWDIR%/bin/mingw32-make.exe (
+   echo bad mingw directory!
+   exit /b 1
+) else (
+   echo mingw directory ok.
+)
+bjam ^
+   -j4 ^
+   toolset=gcc ^
+   variant=release ^
+   threading=multi ^
+   link=static ^
+   runtime-link=static ^
+   --without-mpi ^
+   --without-math ^
+   --without-random ^
+   --without-graph ^
+   --without-graph_parallel ^
+   --without-python ^
+   --without-wave ^
+   --layout=system ^
+   --libdir=%MINGWDIR%/lib ^
+   --includedir=%MINGWDIR%/include ^
+   install
+pause
+------------------------end build.bat----------------------------------
+
+    Описание ключей для bjam Вы можете найти на сайте www.boost.org 
+    (
+        например для версии 1.44.0:
+        http://www.boost.org/doc/libs/1_44_0/more/getting_started/windows.html#or-build-binaries-from-source
+    )
+
+ 8. В консоли выполняем "build.bat", и ждем некоторое время (от 10 до 30 минут,
+    в зависимости от производительности компьютера).
+
+В итоге:
+ а) Заголовочные файлы boost будут установлены в "c:/mingw/include/boost",
+    что избавляет нас от необходимости указывать компилятору путь к ним, при
+    компиляции проектов использующих boost(надо убрать из скрипта).
+ б) Статические библиотеки, также, будут установлены в "c:/mingw/lib", что также
+    избавляет нас от рутиной работы(надо убрать из скрипта).
+
+Все, компилятор mingw и библиотеки boost собраны. Можно приступать к работе.
+
+PS: взято за основу "http://forum.try-catch.ru/index.php?topic=286.0"
+###### end Windows-Mingw ######
