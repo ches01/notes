@@ -1,0 +1,35 @@
+Dropbox with Debian Squeeze
+Для создания пакета nautilus-dropbox.deb необходимо:
+
+1) Создать дирреторию для сборки и получить исходники
+
+# mkdir ~/source
+# cd ~/source/
+# wget https://www.dropbox.com/download?dl=packages/nautilus-dropbox-0.6.7.tar.bz2 -O nautilus-dropbox-0.6.7.tar.bz2
+# tar -xvf nautilus-dropbox-0.6.7.tar.bz2
+# cd nautilus*
+
+2) Постараться собрать и найти все недостающие пакеты: 
+
+# ./configure
+# make
+
+То что понадобилось на моей машине:
+# sudo apt-get install dh-make
+# sudo apt-get install autotools-dev
+# sudo apt-get install python-gtk2-dev
+# sudo apt-get install libnautilus-extension-dev
+# sudo apt-get install docutils
+# sudo apt-get install python-docutils
+
+3) создать  debian/ дирреторию со всеми необходимыми описаниями.
+
+# dh_make -f ../nautilus-dropbox-0.6.7.tar.bz2
+
+4) создать debian пакет (.deb)
+
+# dpkg-buildpackage -rfakeroot
+
+5)  установить только что созданный пакет
+
+# sudo dpkg -i ../nautilus-dropbox_0.6.7-1_amd64.deb
